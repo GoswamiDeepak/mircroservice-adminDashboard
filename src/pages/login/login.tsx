@@ -1,8 +1,35 @@
-import { Button, Card, Checkbox, Flex, Form, Input, Layout, Space } from 'antd';
+import {
+    Alert,
+    Button,
+    Card,
+    Checkbox,
+    Flex,
+    Form,
+    Input,
+    Layout,
+    Space,
+} from 'antd';
 import { LockFilled, LockOutlined, UserOutlined } from '@ant-design/icons';
 import Logo from '../../components/icons/Logo';
+import { useMutation } from '@tanstack/react-query';
+import { Credentials } from '../../types';
+import { login } from '../../http/api';
+
+const loginUser = async (credentials: Credentials) => {
+    // server call logic
+    const { data } = await login(credentials);
+    return data;
+};
 
 const LoginPage = () => {
+    const { mutate, isPending, isError, error } = useMutation({
+        mutationKey: ['login'],
+        mutationFn: loginUser,
+        onSuccess: async () => {
+            console.log('login successfull.');
+        },
+    });
+
     return (
         <>
             <Layout
@@ -39,7 +66,22 @@ const LoginPage = () => {
                                 remember: true,
                                 username: 'test',
                                 password: 'secret',
+                            }}
+                            onFinish={(value) => {
+                                mutate({
+                                    email: value.username,
+                                    password: value.password,
+                                });
+                                console.log(value);
                             }}>
+                            {isError && (
+                                <Alert
+                                    style={{ marginBottom: 24 }}
+                                    type="error"
+                                    message={error.message}
+                                />
+                            )}
+
                             <Form.Item
                                 name="username"
                                 rules={[
@@ -85,7 +127,8 @@ const LoginPage = () => {
                                 <Button
                                     type="primary"
                                     htmlType="submit"
-                                    style={{ width: '100%' }}>
+                                    style={{ width: '100%' }}
+                                    loading={isPending}>
                                     {' '}
                                     Log In
                                 </Button>
