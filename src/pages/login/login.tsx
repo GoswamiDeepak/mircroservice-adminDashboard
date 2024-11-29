@@ -23,7 +23,7 @@ const loginUser = async (credentials: Credentials) => {
 
 const LoginPage = () => {
     const { mutate, isPending, isError, error } = useMutation({
-        mutationKey: ['login'],
+        mutationKey: ['login'], //not require for post
         mutationFn: loginUser,
         onSuccess: async () => {
             console.log('login successfull.');
@@ -64,7 +64,7 @@ const LoginPage = () => {
                         <Form
                             initialValues={{
                                 remember: true,
-                                username: 'test',
+                                username: 'deepakgoswami1@gmail.com',
                                 password: 'secret',
                             }}
                             onFinish={(value) => {
