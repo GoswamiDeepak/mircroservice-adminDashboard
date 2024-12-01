@@ -1,10 +1,24 @@
 import { Navigate, NavLink, Outlet } from 'react-router-dom';
 import { userAuthStore } from '../store';
-import { Layout, Menu, theme } from 'antd';
-import Icon,{ HomeOutlined, UserOutlined } from '@ant-design/icons';
+import {
+    Avatar,
+    Badge,
+    Dropdown,
+    Flex,
+    Layout,
+    Menu,
+    Space,
+    theme,
+} from 'antd';
+import Icon, {
+    BellFilled,
+    HomeOutlined,
+    UserOutlined,
+} from '@ant-design/icons';
 import { useState } from 'react';
 import Logo from '../components/icons/Logo';
 import Restaurant from '../components/icons/Restaurant';
+import { useLogout } from '../hooks/useLogout';
 const { Header, Content, Footer, Sider } = Layout;
 const items = [
     {
@@ -35,6 +49,8 @@ const items = [
 ];
 
 const Dasboard = () => {
+    const { logoutMutate } = useLogout();
+    
     const [collapsed, setCollapsed] = useState(false);
 
     const {
@@ -52,7 +68,7 @@ const Dasboard = () => {
             <Layout style={{ minHeight: '100vh' }}>
                 <Sider
                     collapsible
-                    theme='light'
+                    theme="light"
                     collapsed={collapsed}
                     onCollapse={(value) => setCollapsed(value)}>
                     <div className="logo">
@@ -67,8 +83,41 @@ const Dasboard = () => {
                 </Sider>
                 <Layout>
                     <Header
-                        style={{ padding: 0, background: colorBgContainer }}
-                    />
+                        style={{
+                            padding: '0 16px',
+                            background: colorBgContainer,
+                        }}>
+                        <Flex
+                            gap="middle"
+                            align="start"
+                            justify="space-between">
+                            <Badge text="Global" status="success" />
+                            <Space size={16}>
+                                <Badge dot={true}>
+                                    <BellFilled />
+                                </Badge>
+                                <Dropdown
+                                    menu={{
+                                        items: [
+                                            {
+                                                key: 'logout',
+                                                label: 'Logout',
+                                                onClick: () => logoutMutate(),
+                                            },
+                                        ],
+                                    }}
+                                    placement="bottomRight">
+                                    <Avatar
+                                        style={{
+                                            backgroundColor: '#fde3cf',
+                                            color: '#f56a00',
+                                        }}>
+                                        U
+                                    </Avatar>
+                                </Dropdown>
+                            </Space>
+                        </Flex>
+                    </Header>
                     <Content style={{ margin: '0 16px' }}>
                         <Outlet />
                     </Content>

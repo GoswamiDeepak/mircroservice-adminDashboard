@@ -13,15 +13,17 @@ import { LockFilled, LockOutlined, UserOutlined } from '@ant-design/icons';
 import Logo from '../../components/icons/Logo';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Credentials } from '../../types';
-import { login, self, logout } from '../../http/api';
+import { login, self } from '../../http/api';
 import { userAuthStore } from '../../store';
 import { userPermission } from '../../hooks/userPermission';
+import { useLogout } from '../../hooks/useLogout';
 
 const loginUser = async (credentials: Credentials) => {
     // server call logic
     const { data } = await login(credentials);
     return data;
 };
+
 const getSelf = async () => {
     const { data } = await self();
     return data;
@@ -30,8 +32,10 @@ const getSelf = async () => {
 
 
 const LoginPage = () => {
-    const { setUser, logout:logoutFromStore } = userAuthStore();
+    const { setUser } = userAuthStore();
 
+    const { logoutMutate } = useLogout();
+    
     const { isAllowed } = userPermission();
 
     const { refetch } = useQuery({
@@ -39,16 +43,6 @@ const LoginPage = () => {
         queryFn: getSelf,
         enabled: false,
     });
-
-    const {mutate:logoutMutate} = useMutation({
-        mutationKey: ['logout'],
-        mutationFn: logout,
-        onSuccess: () => {
-            logoutFromStore()
-            //can redirect to customer in client UI
-            return
-        }
-    })
 
     const { mutate, isPending, isError, error } = useMutation({
         mutationKey: ['login'], //not require for post
