@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Link, Navigate, Outlet } from 'react-router-dom';
 import { userAuthStore } from '../store';
 
 const Dasboard = () => {
@@ -9,6 +9,8 @@ const Dasboard = () => {
     return (
         <div>
             <h1>Dashboar</h1>
+    <Link to="/auth/login" > back to login page</Link>
+
             <Outlet />
         </div>
     );
