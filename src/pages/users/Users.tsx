@@ -1,11 +1,12 @@
-import { Breadcrumb, Space, Table } from 'antd';
-import { RightOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Drawer, Space, Table } from 'antd';
+import { PlusOutlined, RightOutlined } from '@ant-design/icons';
 import { Link, Navigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getUsers } from '../../http/api';
 import { User } from '../../types';
 import { userAuthStore } from '../../store';
 import UserFilter from './UserFilter';
+import { useState } from 'react';
 
 const columns = [
     {
@@ -36,6 +37,8 @@ const columns = [
 ];
 
 const Users = () => {
+    const [isDraweropen, setDrawerOpen] = useState(false);
+
     const {
         data: users,
         isLoading,
@@ -74,13 +77,35 @@ const Users = () => {
                         filterValue: string
                     ) => {
                         console.log(filterName, filterValue);
-                    }}
-                />
+                    }}>
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={() => setDrawerOpen(true)}>
+                        Add User
+                    </Button>
+                </UserFilter>
+
                 {isLoading && <div>Loading...</div>}
 
                 {isError && <div>{error.message}</div>}
 
                 <Table columns={columns} dataSource={users} rowKey={'id'} />
+
+                <Drawer
+                    title="Create user"
+                    width={720}
+                    open={isDraweropen}
+                    destroyOnClose={true}
+                    onClose={() => setDrawerOpen(false)}
+                    extra={
+                        <Space>
+                            <Button>Cancel</Button>
+                            <Button type="primary">Submit</Button>
+                        </Space>
+                    }>
+                    <p>drawer</p>
+                </Drawer>
             </Space>
         </>
     );
