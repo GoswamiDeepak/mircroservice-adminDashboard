@@ -91,7 +91,14 @@ const Dasboard = () => {
                             gap="middle"
                             align="start"
                             justify="space-between">
-                            <Badge text={user.role === 'admin' ? 'You are an admin.' : user.tenant?.name} status="success" />
+                            <Badge
+                                text={
+                                    user.role === 'admin'
+                                        ? 'You are an admin.'
+                                        : user.tenant?.name
+                                }
+                                status="success"
+                            />
                             <Space size={16}>
                                 <Badge dot={true}>
                                     <BellFilled />
@@ -118,7 +125,7 @@ const Dasboard = () => {
                             </Space>
                         </Flex>
                     </Header>
-                    <Content style={{ margin: '0 16px' }}>
+                    <Content style={{ margin: '24px' }}>
                         <Outlet />
                     </Content>
                     <Footer style={{ textAlign: 'center' }}>
