@@ -54,12 +54,10 @@ const getMenuItems = (role: string) => {
             label: <NavLink to="/users">Users</NavLink>,
         });
         return menus;
-
         /*
         if we use priority then we have to use sort method base on priority.
         */
     }
-
     return baseItems;
 };
 
