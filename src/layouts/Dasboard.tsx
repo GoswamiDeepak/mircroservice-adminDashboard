@@ -20,33 +20,48 @@ import Logo from '../components/icons/Logo';
 import Restaurant from '../components/icons/Restaurant';
 import { useLogout } from '../hooks/useLogout';
 const { Header, Content, Footer, Sider } = Layout;
-const items = [
-    {
-        key: '/',
-        icon: <HomeOutlined />,
-        label: <NavLink to="/">Home</NavLink>,
-    },
-    {
-        key: '/users',
-        icon: <UserOutlined />,
-        label: <NavLink to="/users">Users</NavLink>,
-    },
-    {
-        key: '/restaurants',
-        icon: <Icon component={Restaurant} />,
-        label: <NavLink to="/restaurants">Restaurants</NavLink>,
-    },
-    {
-        key: '/products',
-        icon: <UserOutlined />,
-        label: <NavLink to="/products">Products</NavLink>,
-    },
-    {
-        key: '/promos',
-        icon: <UserOutlined />,
-        label: <NavLink to="/promos">Promos</NavLink>,
-    },
-];
+
+const getMenuItems = (role: string) => {
+    const baseItems = [
+        {
+            key: '/',
+            icon: <HomeOutlined />,
+            label: <NavLink to="/">Home</NavLink>,
+            // priority:1
+        },
+        {
+            key: '/restaurants',
+            icon: <Icon component={Restaurant} />,
+            label: <NavLink to="/restaurants">Restaurants</NavLink>,
+        },
+        {
+            key: '/products',
+            icon: <UserOutlined />,
+            label: <NavLink to="/products">Products</NavLink>,
+        },
+        {
+            key: '/promos',
+            icon: <UserOutlined />,
+            label: <NavLink to="/promos">Promos</NavLink>,
+        },
+    ];
+
+    if (role === 'admin') {
+        const menus = [...baseItems];
+        menus.splice(1, 0, {
+            key: '/users',
+            icon: <UserOutlined />,
+            label: <NavLink to="/users">Users</NavLink>,
+        });
+        return menus;
+
+        /*
+        if we use priority then we have to use sort method base on priority.
+        */
+    }
+
+    return baseItems;
+};
 
 const Dasboard = () => {
     const { logoutMutate } = useLogout();
@@ -62,6 +77,7 @@ const Dasboard = () => {
     if (user === null) {
         return <Navigate to="/auth/login" replace={true} />;
     }
+    const items = getMenuItems(user?.role);
 
     return (
         <div>
