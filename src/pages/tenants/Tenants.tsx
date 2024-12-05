@@ -1,11 +1,12 @@
 import { Breadcrumb, Button, Drawer, Form, Space, Table, theme } from 'antd';
 import { PlusOutlined, RightOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { getTenants } from '../../http/api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createTenant, getTenants } from '../../http/api';
 import TenantFilter from './TenantFilter';
 import { useState } from 'react';
 import TenantForm from './form/TenantForm';
+import { Tenant } from '../../types';
 
 const columns = [
     {
@@ -27,7 +28,7 @@ const columns = [
 
 const Tenants = () => {
     const [form] = Form.useForm();
-
+    const queryClient = useQueryClient();
     const [isDraweropen, setDrawerOpen] = useState(false);
 
     const {
@@ -44,7 +45,22 @@ const Tenants = () => {
         queryFn: async () => getTenants().then((res) => res.data),
     });
 
-    const onHandlerSubmit = () => {
+    const { mutate: createTenantMutate } = useMutation({
+        mutationKey: ['createTenant'],
+        mutationFn: async (data: Tenant) =>
+            createTenant(data).then((res) => res.data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['tenant'],
+            });
+            return;
+        },
+    });
+
+    const onHandlerSubmit = async () => {
+        await form.validateFields();
+        createTenantMutate(form.getFieldsValue());
+        form.resetFields();
         console.log(form.getFieldsValue());
     };
 
