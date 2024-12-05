@@ -110,7 +110,7 @@ const Users = () => {
                             <Button type="primary">Submit</Button>
                         </Space>
                     }>
-                    <Form layout='vertical'>
+                    <Form layout="vertical">
                         <UserForm />
                     </Form>
                 </Drawer>
