@@ -11,7 +11,7 @@ const Order = () => {
                 height="37"
                 rx="12"
                 fill="#F65F42"
-                fill-opacity="0.12"
+                fillOpacity="0.12"
             />
             <g clip-path="url(#clip0_9_149)">
                 <path
