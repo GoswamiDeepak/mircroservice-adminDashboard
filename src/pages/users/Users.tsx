@@ -8,6 +8,7 @@ import { userAuthStore } from '../../store';
 import UserFilter from './UserFilter';
 import { useState } from 'react';
 import UserForm from './forms/UserForm';
+import { PER_PAGE } from '../../constant';
 
 const columns = [
     {
@@ -40,6 +41,11 @@ const columns = [
 const Users = () => {
     const queryClient = useQueryClient();
 
+    const [queryParams, setQueryParams] = useState({
+        perPage: PER_PAGE,
+        currentPage: 1,
+    });
+
     const [form] = Form.useForm();
 
     const [isDraweropen, setDrawerOpen] = useState(false);
@@ -48,17 +54,18 @@ const Users = () => {
         token: { colorBgLayout },
     } = theme.useToken();
 
-    
-
     const {
         data: users,
         isLoading,
         isError,
         error,
     } = useQuery({
-        queryKey: ['users'],
+        queryKey: ['users', queryParams],
         queryFn: async () => {
-            const res = await getUsers();
+            const queryString = new URLSearchParams(
+                queryParams as unknown as Record<string, string>
+            ).toString();
+            const res = await getUsers(queryString);
             return res.data;
         },
     });
@@ -121,7 +128,21 @@ const Users = () => {
 
                 {isError && <div>{error.message}</div>}
 
-                <Table columns={columns} dataSource={users} rowKey={'id'} />
+                <Table
+                    columns={columns}
+                    dataSource={users?.data}
+                    rowKey={'id'}
+                    pagination={{
+                        total: users?.total,
+                        pageSize: queryParams?.perPage,
+                        current: queryParams?.currentPage,
+                        onChange: (page) => {
+                            setQueryParams((prev) => {
+                                return { ...prev, currentPage: page };
+                            });
+                        },
+                    }}
+                />
 
                 <Drawer
                     title="Create user"
