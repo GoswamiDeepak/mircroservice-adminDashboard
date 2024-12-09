@@ -130,7 +130,7 @@ const Users = () => {
     const debouncedQUpdate = useMemo(() => {
         return debounce((value: string | undefined) => {
             setQueryParams((prev) => ({ ...prev, q: value }));
-        }, 1000);
+        }, 500);
     }, []);
 
     const onFilterChange = (changedFields: FieldData[]) => {
