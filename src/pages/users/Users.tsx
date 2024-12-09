@@ -26,9 +26,10 @@ import { createUser, getUsers } from '../../http/api';
 import { CreateUserData, FieldData, User } from '../../types';
 import { userAuthStore } from '../../store';
 import UserFilter from './UserFilter';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import UserForm from './forms/UserForm';
 import { PER_PAGE } from '../../constant';
+import { debounce } from 'lodash';
 
 const columns = [
     {
@@ -84,7 +85,6 @@ const Users = () => {
     } = useQuery({
         queryKey: ['users', queryParams],
         queryFn: async () => {
-            
             const filteredParams = Object.fromEntries(
                 Object.entries(queryParams).filter((item) => !!item[1])
             );
@@ -119,13 +119,24 @@ const Users = () => {
         setDrawerOpen(false);
     };
 
+    const debouncedQUpdate = useMemo(() => {
+        return debounce((value: string | undefined) => {
+            setQueryParams((prev) => ({ ...prev, q: value }));
+        }, 1000);
+    }, []);
+
     const onFilterChange = (changedFields: FieldData[]) => {
         const changedFilterFields = changedFields
             .map((item) => ({
                 [item.name[0]]: item.value,
             }))
             .reduce((acc, item) => ({ ...acc, ...item }), {});
-        setQueryParams((prev) => ({ ...prev, ...changedFilterFields }));
+
+        if ('q' in changedFilterFields) {
+            debouncedQUpdate(changedFilterFields.q);
+        } else {
+            setQueryParams((prev) => ({ ...prev, ...changedFilterFields }));
+        }
     };
 
     if (user?.role !== 'admin') {
