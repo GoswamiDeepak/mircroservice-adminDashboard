@@ -92,7 +92,7 @@ const Dasboard = () => {
                     </div>
                     <Menu
                         theme="light"
-                        defaultSelectedKeys={['/']}
+                        defaultSelectedKeys={[location.pathname]}
                         mode="inline"
                         items={items}
                     />
