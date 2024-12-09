@@ -29,11 +29,7 @@ const getMenuItems = (role: string) => {
             label: <NavLink to="/">Home</NavLink>,
             // priority:1
         },
-        {
-            key: '/restaurants',
-            icon: <Icon component={Restaurant} />,
-            label: <NavLink to="/restaurants">Restaurants</NavLink>,
-        },
+
         {
             key: '/products',
             icon: <UserOutlined />,
@@ -52,6 +48,11 @@ const getMenuItems = (role: string) => {
             key: '/users',
             icon: <UserOutlined />,
             label: <NavLink to="/users">Users</NavLink>,
+        });
+        menus.splice(2, 0, {
+            key: '/restaurants',
+            icon: <Icon component={Restaurant} />,
+            label: <NavLink to="/restaurants">Restaurants</NavLink>,
         });
         return menus;
         /*
@@ -75,7 +76,12 @@ const Dasboard = () => {
     const { user } = userAuthStore();
 
     if (user === null) {
-        return <Navigate to={`/auth/login?returnTo=${location.pathname}`} replace={true} />;
+        return (
+            <Navigate
+                to={`/auth/login?returnTo=${location.pathname}`}
+                replace={true}
+            />
+        );
     }
     const items = getMenuItems(user?.role);
 
