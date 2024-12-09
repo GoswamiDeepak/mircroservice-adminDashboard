@@ -57,6 +57,14 @@ const columns = [
         dataIndex: 'role',
         key: 'role',
     },
+    {
+        title: 'Tenant',
+        dataIndex: 'tenant',
+        key: 'tenant',
+        render: (_text: string, record: User) => {
+            return <div>{record.tenant?.name}</div>;
+        },
+    },
 ];
 
 const Users = () => {

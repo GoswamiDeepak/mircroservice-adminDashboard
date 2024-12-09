@@ -8,6 +8,7 @@ export type User = {
     email: string;
     firstname: string;
     lastname: string;
+    tenant?: Tenant | null
     createdAt: string;
 }
 
