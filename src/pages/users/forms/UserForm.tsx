@@ -3,7 +3,7 @@ import { getTenants } from '../../../http/api';
 import { useQuery } from '@tanstack/react-query';
 import { Tenant } from '../../../types';
 
-const UserForm = () => {
+const UserForm = ({ isEditMode = false }: { isEditMode: boolean }) => {
     const { data: tenants } = useQuery({
         queryKey: ['tenants'],
         queryFn: async () => {
@@ -63,23 +63,27 @@ const UserForm = () => {
                             </Col>
                         </Row>
                     </Card>
-                    <Card title="Security Info" bordered={false}>
-                        <Row gutter={20}>
-                            <Col span={12}>
-                                <Form.Item
-                                    label="Password"
-                                    name="password"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Password is Required.',
-                                        },
-                                    ]}>
-                                    <Input size="large" type="password" />
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                    </Card>
+                    {!isEditMode && (
+                        <Card title="Security Info" bordered={false}>
+                            <Row gutter={20}>
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Password"
+                                        name="password"
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message:
+                                                    'Password is Required.',
+                                            },
+                                        ]}>
+                                        <Input size="large" type="password" />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                        </Card>
+                    )}
+
                     <Card title="Role Info" bordered={false}>
                         <Row gutter={20}>
                             <Col span={12}>
@@ -93,6 +97,7 @@ const UserForm = () => {
                                         },
                                     ]}>
                                     <Select
+                                        id="selectBoxInUserForm"
                                         size="large"
                                         style={{ width: '100%' }}
                                         allowClear={true}
@@ -127,7 +132,9 @@ const UserForm = () => {
                                         onChange={() => {}}
                                         placeholder="Select Restaurent">
                                         {tenants?.map((tenants: Tenant) => (
-                                            <Select.Option value={tenants.id}>
+                                            <Select.Option
+                                                value={tenants.id}
+                                                key={tenants.id}>
                                                 {tenants.name}
                                             </Select.Option>
                                         ))}
