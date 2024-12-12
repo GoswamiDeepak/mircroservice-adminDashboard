@@ -21,10 +21,11 @@ export type CreateUserData = {
 }
 
 export type Tenant = {
-    id?: number;
+    id: number;
     name: string;
     address: string;
 }
+
 
 export type FieldData = {
     name: string[];

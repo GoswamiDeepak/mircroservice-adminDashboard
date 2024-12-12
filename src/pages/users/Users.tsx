@@ -1,6 +1,6 @@
 /**
  * Users Component
- * 
+ *
  * This component is responsible for managing and displaying a list of users.
  * It includes functionalities such as filtering, pagination, creating, editing,
  * and deleting users. The component also utilizes react-query for data fetching and state management.
@@ -348,6 +348,7 @@ const Users = () => {
                               }>
                               <Form layout="vertical" form={form}>
                                     <UserForm
+                                          queryParams={queryParams}
                                           isEditMode={!!currentEditingUser}
                                     />
                               </Form>
