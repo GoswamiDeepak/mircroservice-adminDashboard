@@ -1,5 +1,6 @@
 import axios from "axios";
 import { userAuthStore } from "../store";
+import { AUTH_SERVICE } from "./api";
 
 export const api = axios.create({
     baseURL: import.meta.env.VITE_BACKEND_API_URL,
@@ -12,7 +13,7 @@ export const api = axios.create({
 // const refreshToken = () => api.get('/api/refresh')
 
 const refreshToken = async () => {
-    await axios.post(`${import.meta.env.VITE_BACKEND_API_URL}/auth/refresh`,{}, {
+    await axios.post(`${import.meta.env.VITE_BACKEND_API_URL}/${AUTH_SERVICE}/auth/refresh`,{}, {
         withCredentials: true,
     })
 }
@@ -26,7 +27,6 @@ api.interceptors.response.use((response)=>response, async(error)=> {
          await refreshToken()
          return api.request({...originalRequest, headers})
        } catch (error) {
-        console.log('token refresh error',error)
         userAuthStore.getState().logout();
         return Promise.reject(error);
        }

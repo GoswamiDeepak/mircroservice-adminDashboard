@@ -31,3 +31,8 @@ export type FieldData = {
     name: string[];
     value?: string;
 }
+
+export interface Category {
+    _id: number;
+    name: string;
+}
