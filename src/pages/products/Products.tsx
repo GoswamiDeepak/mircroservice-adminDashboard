@@ -9,6 +9,7 @@ import { getProducts } from '../../http/api';
 import { FieldData, Product } from '../../types';
 import { format } from 'date-fns';
 import { debounce } from 'lodash';
+import { userAuthStore } from '../../store';
 
 const columns = [
       // {
@@ -49,12 +50,15 @@ const columns = [
 ];
 
 const Products = () => {
+      const { user } = userAuthStore();
+      
       const [form] = Form.useForm();
 
       const [queryParams, setQueryParams] = useState({
             // limit: PER_PAGE,
             limit: 1,
             page: 1,
+            tenantId: user!.role !== 'admin' ? user?.tenant?.id : undefined,
       });
       //fetch product data
       const {

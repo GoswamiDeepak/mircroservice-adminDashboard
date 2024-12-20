@@ -1,12 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { Card, Col, Form, Input, Row, Select, Switch, Typography } from 'antd';
+import { Card, Col, Form, Input, Row, Select, Space, Switch, Typography } from 'antd';
 import { getCategories, getTenants } from '../../http/api';
 import { Category, Tenant } from '../../types';
+import { userAuthStore } from '../../store';
 
 type ProductsFilterProps = {
       children?: React.ReactNode;
 };
 const ProductsFilter = ({ children }: ProductsFilterProps) => {
+      const { user } = userAuthStore();
+
       const { data: restaurants } = useQuery({
             queryKey: ['restaurants'],
             queryFn: async () => {
@@ -50,32 +53,39 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
                                                       </Select>
                                                 </Form.Item>
                                           </Col>
+                                          {user?.role === 'admin' && (
+                                                <Col span={6}>
+                                                      <Form.Item name="tenantId">
+                                                            <Select
+                                                                  style={{
+                                                                        width: '100%',
+                                                                  }}
+                                                                  allowClear={true}
+                                                                  placeholder="Select Restaurent">
+                                                                  {restaurants?.data.map((restaurant: Tenant) => {
+                                                                        return (
+                                                                              <Select.Option value={restaurant.id} key={restaurant.id}>
+                                                                                    {restaurant.name}
+                                                                              </Select.Option>
+                                                                        );
+                                                                  })}
+                                                            </Select>
+                                                      </Form.Item>
+                                                </Col>
+                                          )}
+
                                           <Col span={6}>
-                                                <Form.Item name="tenantId">
-                                                      <Select
-                                                            style={{
-                                                                  width: '100%',
-                                                            }}
-                                                            allowClear={true}
-                                                            placeholder="Select Restaurent">
-                                                            {restaurants?.data.map((restaurant: Tenant) => {
-                                                                  return (
-                                                                        <Select.Option value={restaurant.id} key={restaurant.id}>
-                                                                              {restaurant.name}
-                                                                        </Select.Option>
-                                                                  );
-                                                            })}
-                                                            {/* <Select.Option value="ban">
-                                                            Ban
-                                                      </Select.Option> */}
-                                                      </Select>
-                                                </Form.Item>
-                                          </Col>
-                                          <Col span={6}>
-                                                <Form.Item name="isPublish">
-                                                      <Switch defaultChecked={false} onChange={() => {}} />
-                                                </Form.Item>
-                                                <Typography.Text style={{ marginLeft: 2 }}>Show only publised</Typography.Text>
+                                                <Space
+                                                      style={{
+                                                            width: '100%',
+                                                      }}>
+                                                      <Form.Item name="isPublish">
+                                                            <Switch defaultChecked={false} onChange={() => {}} />
+                                                      </Form.Item>
+                                                      <Typography.Text style={{ marginBottom: 20, display: 'block', fontSize: 12 }}>
+                                                            Show only publised
+                                                      </Typography.Text>
+                                                </Space>
                                           </Col>
                                     </Row>
                               </Col>
