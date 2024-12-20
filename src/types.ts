@@ -36,3 +36,14 @@ export interface Category {
     _id: number;
     name: string;
 }
+
+export interface Product {
+    _id: number;
+    name: string;
+    description: string; 
+    image: string;
+    categoy: Category;
+    status: boolean;
+    isPublish: boolean;
+    createdAt: string;
+}

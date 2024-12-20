@@ -7,12 +7,11 @@ type ProductsFilterProps = {
       children?: React.ReactNode;
 };
 const ProductsFilter = ({ children }: ProductsFilterProps) => {
+
       const { data: restaurants } = useQuery({
             queryKey: ['restaurants'],
             queryFn: async () => {
-                  const { data } = await getTenants(
-                        `perPage=100&currentPage=1`
-                  );
+                  const { data } = await getTenants(`perPage=100&currentPage=1`);
                   return data;
             },
       });
@@ -25,7 +24,6 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
             },
       });
 
-
       return (
             <>
                   <Card>
@@ -34,10 +32,7 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
                                     <Row gutter={20}>
                                           <Col span={6}>
                                                 <Form.Item name="q">
-                                                      <Input.Search
-                                                            allowClear={true}
-                                                            placeholder="search"
-                                                      />
+                                                      <Input.Search allowClear={true} placeholder="search" />
                                                 </Form.Item>
                                           </Col>
                                           <Col span={6}>
@@ -48,23 +43,11 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
                                                             }}
                                                             allowClear={true}
                                                             placeholder="Select Categoires">
-                                                            {categories?.map(
-                                                                  (
-                                                                        category: Category
-                                                                  ) => (
-                                                                        <Select.Option
-                                                                              value={
-                                                                                    category._id
-                                                                              }
-                                                                              key={
-                                                                                    category._id
-                                                                              }>
-                                                                              {
-                                                                                    category.name
-                                                                              }
-                                                                        </Select.Option>
-                                                                  )
-                                                            )}
+                                                            {categories?.map((category: Category) => (
+                                                                  <Select.Option value={category._id} key={category._id}>
+                                                                        {category.name}
+                                                                  </Select.Option>
+                                                            ))}
                                                       </Select>
                                                 </Form.Item>
                                           </Col>
@@ -76,25 +59,13 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
                                                             }}
                                                             allowClear={true}
                                                             placeholder="Select Restaurent">
-                                                            {restaurants?.data.map(
-                                                                  (
-                                                                        restaurant: Tenant
-                                                                  ) => {
-                                                                        return (
-                                                                              <Select.Option
-                                                                                    value={
-                                                                                          restaurant.id
-                                                                                    }
-                                                                                    key={
-                                                                                          restaurant.id
-                                                                                    }>
-                                                                                    {
-                                                                                          restaurant.name
-                                                                                    }
-                                                                              </Select.Option>
-                                                                        );
-                                                                  }
-                                                            )}
+                                                            {restaurants?.data.map((restaurant: Tenant) => {
+                                                                  return (
+                                                                        <Select.Option value={restaurant.id} key={restaurant.id}>
+                                                                              {restaurant.name}
+                                                                        </Select.Option>
+                                                                  );
+                                                            })}
                                                             {/* <Select.Option value="ban">
                                                             Ban
                                                       </Select.Option> */}
@@ -102,13 +73,8 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
                                                 </Form.Item>
                                           </Col>
                                           <Col span={6}>
-                                                <Switch
-                                                      defaultChecked
-                                                      onChange={() => {}}
-                                                />
-                                                <Typography.Text>
-                                                      Show only publised
-                                                </Typography.Text>
+                                                <Switch defaultChecked onChange={() => {}} />
+                                                <Typography.Text style={{marginLeft: 2}}>Show only publised</Typography.Text>
                                           </Col>
                                     </Row>
                               </Col>
