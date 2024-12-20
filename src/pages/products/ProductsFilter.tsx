@@ -7,7 +7,6 @@ type ProductsFilterProps = {
       children?: React.ReactNode;
 };
 const ProductsFilter = ({ children }: ProductsFilterProps) => {
-
       const { data: restaurants } = useQuery({
             queryKey: ['restaurants'],
             queryFn: async () => {
@@ -36,7 +35,7 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
                                                 </Form.Item>
                                           </Col>
                                           <Col span={6}>
-                                                <Form.Item name="category">
+                                                <Form.Item name="categoryId">
                                                       <Select
                                                             style={{
                                                                   width: '100%',
@@ -52,7 +51,7 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
                                                 </Form.Item>
                                           </Col>
                                           <Col span={6}>
-                                                <Form.Item name="restaurant">
+                                                <Form.Item name="tenantId">
                                                       <Select
                                                             style={{
                                                                   width: '100%',
@@ -73,8 +72,10 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
                                                 </Form.Item>
                                           </Col>
                                           <Col span={6}>
-                                                <Switch defaultChecked onChange={() => {}} />
-                                                <Typography.Text style={{marginLeft: 2}}>Show only publised</Typography.Text>
+                                                <Form.Item name="isPublish">
+                                                      <Switch defaultChecked={false} onChange={() => {}} />
+                                                </Form.Item>
+                                                <Typography.Text style={{ marginLeft: 2 }}>Show only publised</Typography.Text>
                                           </Col>
                                     </Row>
                               </Col>

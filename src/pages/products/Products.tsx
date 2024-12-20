@@ -2,13 +2,13 @@ import { Breadcrumb, Button, Flex, Form, Image, Space, Spin, Table, Tag, Typogra
 import { LoadingOutlined, PlusOutlined, RightOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import ProductsFilter from './ProductsFilter';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { PER_PAGE } from '../../constant';
 import { useQuery } from '@tanstack/react-query';
 import { getProducts } from '../../http/api';
-import { Product } from '../../types';
-import { render } from '@testing-library/react';
+import { FieldData, Product } from '../../types';
 import { format } from 'date-fns';
+import { debounce } from 'lodash';
 
 const columns = [
       // {
@@ -52,8 +52,9 @@ const Products = () => {
       const [form] = Form.useForm();
 
       const [queryParams, setQueryParams] = useState({
-            perPage: PER_PAGE,
-            currentPage: 1,
+            // limit: PER_PAGE,
+            limit: 1,
+            page: 1,
       });
       //fetch product data
       const {
@@ -62,16 +63,50 @@ const Products = () => {
             isError,
             error,
       } = useQuery({
-            queryKey: ['product'],
+            queryKey: ['product', queryParams],
             queryFn: async () => {
                   const filteredParams = Object.fromEntries(Object.entries(queryParams).filter((item) => !!item[1]));
+                  // const filteredParams = Object.fromEntries(Object.entries(queryParams).filter((item) =>{
+                  //       if(item[0] === 'isPublish'){
+                  //             return true
+                  //       }
+                  //       return !!item[1];
+                  // }));
 
                   const queryString = new URLSearchParams(filteredParams as unknown as Record<string, string>).toString();
-
                   const res = await getProducts(queryString);
                   return res.data;
             },
       });
+
+      // Debounce for updating query parameters
+      const debouncedQUpdate = useMemo(() => {
+            return debounce((value: string | undefined) => {
+                  setQueryParams((prev) => ({
+                        ...prev,
+                        q: value,
+                        page: 1,
+                  }));
+            }, 500);
+      }, []);
+
+      const handleFilteration = (changedFields: FieldData[]) => {
+            const changedFilterFields = changedFields
+                  .map((item) => ({
+                        [item.name[0]]: item.value,
+                  }))
+                  .reduce((acc, item) => ({ ...acc, ...item }), {});
+
+            if ('q' in changedFilterFields) {
+                  debouncedQUpdate(changedFilterFields.q);
+            } else {
+                  setQueryParams((prev) => ({
+                        ...prev,
+                        ...changedFilterFields,
+                        page: 1,
+                  }));
+            }
+      };
 
       return (
             <>
@@ -90,7 +125,7 @@ const Products = () => {
 
                               {isError && <Typography.Text type="danger">{error.message}</Typography.Text>}
                         </Flex>
-                        <Form form={form} onFieldsChange={() => {}}>
+                        <Form form={form} onFieldsChange={handleFilteration}>
                               <ProductsFilter>
                                     <Button type="primary" icon={<PlusOutlined />} onClick={() => {}}>
                                           Add Product
@@ -118,13 +153,13 @@ const Products = () => {
                               dataSource={product?.data}
                               pagination={{
                                     total: product?.total,
-                                    pageSize: product?.perPage,
-                                    current: product?.currentPage,
+                                    pageSize: queryParams?.limit,
+                                    current: queryParams?.page,
                                     onChange: (page) => {
                                           setQueryParams((prev) => {
                                                 return {
                                                       ...prev,
-                                                      currentPage: page,
+                                                      page: page,
                                                 };
                                           });
                                     },
