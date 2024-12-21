@@ -1,4 +1,4 @@
-import { Card, Col, Form, Input, Row, Select, Space, Switch, Typography } from 'antd';
+import { Card, Col, Form, FormInstance, Input, Row, Select, Space, Switch, Typography } from 'antd';
 import { Category, Tenant } from '../../../types';
 import { useQuery } from '@tanstack/react-query';
 import { getCategories, getTenants } from '../../../http/api';
@@ -8,7 +8,7 @@ import AttributeSection from './AttributeSection';
 import ProductImage from './ProductImage';
 import { userAuthStore } from '../../../store';
 
-const ProductForm = () => {
+const ProductForm = ({ form }: { form: FormInstance }) => {
       const { user } = userAuthStore();
       const selectedCategory = Form.useWatch('categoryId');
 
@@ -69,7 +69,8 @@ const ProductForm = () => {
                                                                   placeholder="Select Category">
                                                                   {categories?.map((categories: Category) => (
                                                                         <Select.Option
-                                                                              value={JSON.stringify(categories)}
+                                                                              // value={JSON.stringify(categories)}
+                                                                              value={categories._id}
                                                                               key={categories._id}>
                                                                               {categories.name}
                                                                         </Select.Option>
@@ -98,7 +99,7 @@ const ProductForm = () => {
                                           </Row>
                                     </Card>
                                     <Card title="Product Image" bordered={false}>
-                                          <ProductImage />
+                                          <ProductImage initialImage={form.getFieldValue('image')} />
                                     </Card>
                                     {user?.role === 'admin' && (
                                           <Card title="Restaurents" bordered={false}>
@@ -122,7 +123,7 @@ const ProductForm = () => {
                                                                   onChange={() => {}}
                                                                   placeholder="Select Restaurents">
                                                                   {tenants?.data?.map((tenants: Tenant) => (
-                                                                        <Select.Option value={tenants.id} key={tenants.id}>
+                                                                        <Select.Option value={String(tenants.id)} key={tenants.id}>
                                                                               {tenants.name}
                                                                         </Select.Option>
                                                                   ))}

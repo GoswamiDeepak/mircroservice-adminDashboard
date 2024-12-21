@@ -53,15 +53,22 @@ export interface Category {
     attributes: Attribute[];
 }
 
-export interface Product {
-    _id: number;
+export interface ProductAtrribute {
+    name: string;
+    value: string | boolean;
+}
+export interface Product {    
+    _id: number | string;
     name: string;
     description: string; 
     image: string;
-    categoy: Category;
+    category: Category | string;
     status: boolean;
+    tenant: Tenant;
     isPublish: boolean;
     createdAt: string;
+    attributes: ProductAtrribute[];
+    priceConfiguration: PriceConfiguaration;
 }
 
 export type CreateProductData = Product & {
