@@ -21,3 +21,8 @@ export const editTenant = (tenant: Tenant, id: number) => api.patch(`${AUTH_SERV
 export const getCategories = () => api.get(`${CATALOG_SERVICE}/categories`);
 
 export const getProducts = (queryString: string) => api.get(`${CATALOG_SERVICE}/products?${queryString}`);
+export const postProduct = (data: FormData) => api.post(`${CATALOG_SERVICE}/products`, data, {
+    headers: {
+        'Content-Type': 'multipart/form-data',
+    },
+});

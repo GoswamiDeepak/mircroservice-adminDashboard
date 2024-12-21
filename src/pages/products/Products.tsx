@@ -1,15 +1,17 @@
-import { Breadcrumb, Button, Flex, Form, Image, Space, Spin, Table, Tag, Typography } from 'antd';
+import { Breadcrumb, Button, Drawer, Flex, Form, Image, Space, Spin, Table, Tag, theme, Typography } from 'antd';
 import { LoadingOutlined, PlusOutlined, RightOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import ProductsFilter from './ProductsFilter';
 import { useMemo, useState } from 'react';
 import { PER_PAGE } from '../../constant';
-import { useQuery } from '@tanstack/react-query';
-import { getProducts } from '../../http/api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getProducts, postProduct } from '../../http/api';
 import { FieldData, Product } from '../../types';
 import { format } from 'date-fns';
 import { debounce } from 'lodash';
 import { userAuthStore } from '../../store';
+import ProductForm from './forms/ProductForm';
+import { makeFormData } from './helper';
 
 const columns = [
       // {
@@ -51,15 +53,25 @@ const columns = [
 
 const Products = () => {
       const { user } = userAuthStore();
-      
+
+      const queryClient = useQueryClient();
+
+      const [filterForm] = Form.useForm();
       const [form] = Form.useForm();
 
+      const {
+            token: { colorBgLayout },
+      } = theme.useToken();
+
       const [queryParams, setQueryParams] = useState({
-            // limit: PER_PAGE,
-            limit: 1,
+            limit: PER_PAGE,
+            // limit: 1,
             page: 1,
             tenantId: user!.role !== 'admin' ? user?.tenant?.id : undefined,
       });
+
+      const [isDraweropen, setDrawerOpen] = useState(false);
+
       //fetch product data
       const {
             data: product,
@@ -67,16 +79,9 @@ const Products = () => {
             isError,
             error,
       } = useQuery({
-            queryKey: ['product', queryParams],
+            queryKey: ['products', queryParams],
             queryFn: async () => {
                   const filteredParams = Object.fromEntries(Object.entries(queryParams).filter((item) => !!item[1]));
-                  // const filteredParams = Object.fromEntries(Object.entries(queryParams).filter((item) =>{
-                  //       if(item[0] === 'isPublish'){
-                  //             return true
-                  //       }
-                  //       return !!item[1];
-                  // }));
-
                   const queryString = new URLSearchParams(filteredParams as unknown as Record<string, string>).toString();
                   const res = await getProducts(queryString);
                   return res.data;
@@ -112,6 +117,63 @@ const Products = () => {
             }
       };
 
+      //create product query
+      const { mutate: createProductMutate, isPending } = useMutation({
+            mutationKey: ['createProduct'],
+            mutationFn: async (formData: FormData) => {
+                  // const formData = makeFormData(data);
+                  return await postProduct(formData);
+            },
+            onSuccess: () => {
+                  queryClient.invalidateQueries({
+                        queryKey: ['products'],
+                  });
+                  form.resetFields();
+                  setDrawerOpen(false);
+                  return;
+            },
+      });
+
+      const onHandleSubmit = async () => {
+            await form.validateFields();
+            const priceConfiguration = form.getFieldValue('priceConfiguration');
+            const pricing = Object.entries(priceConfiguration).reduce((acc, [key, value]) => {
+                  const parsedKey = JSON.parse(key);
+                  // console.log('Key', parsedKey);
+                  // console.log('Value', value);
+                  return {
+                        ...acc,
+                        [parsedKey.configrationKey]: {
+                              priceType: parsedKey.configrationValue.priceType,
+                              availableOptions: value,
+                        },
+                  };
+            }, {});
+
+            const categoryId = JSON.parse(form.getFieldValue('categoryId'))._id;
+
+            const attributes = Object.entries(form.getFieldValue('attributes')).map(([key, value]) => {
+                  return {
+                        name: key,
+                        value: value,
+                  };
+            });
+
+            const postData = {
+                  ...form.getFieldsValue(),
+                  tenantId: user?.role === 'admin' ? form.getFieldValue('tenantId') : user?.tenant?.id,
+                  isPublish: form.getFieldValue('isPublish') ? true : false,
+                  image: form.getFieldValue('image'),
+                  categoryId,
+                  priceConfiguration: pricing,
+                  attributes,
+            };
+
+            const formData = makeFormData(postData);
+
+            await createProductMutate(formData);
+      };
+
       return (
             <>
                   <Space direction="vertical" size={'large'} style={{ width: '100%' }}>
@@ -129,9 +191,9 @@ const Products = () => {
 
                               {isError && <Typography.Text type="danger">{error.message}</Typography.Text>}
                         </Flex>
-                        <Form form={form} onFieldsChange={handleFilteration}>
+                        <Form form={filterForm} onFieldsChange={handleFilteration}>
                               <ProductsFilter>
-                                    <Button type="primary" icon={<PlusOutlined />} onClick={() => {}}>
+                                    <Button type="primary" icon={<PlusOutlined />} onClick={() => setDrawerOpen(true)}>
                                           Add Product
                                     </Button>
                               </ProductsFilter>
@@ -142,6 +204,7 @@ const Products = () => {
                                     ...columns,
                                     {
                                           title: 'Actions',
+                                          // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
                                           render: (_: string, record: Product) => {
                                                 return (
                                                       <Space>
@@ -172,6 +235,27 @@ const Products = () => {
                                     },
                               }}
                         />
+
+                        <Drawer
+                              title={'Create Product'}
+                              width={720}
+                              open={isDraweropen}
+                              styles={{ body: { background: colorBgLayout } }}
+                              onClose={() => {
+                                    setDrawerOpen(false);
+                              }}
+                              extra={
+                                    <Space>
+                                          <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
+                                          <Button type="primary" onClick={onHandleSubmit} loading={isPending}>
+                                                Submit
+                                          </Button>
+                                    </Space>
+                              }>
+                              <Form layout="vertical" form={form}>
+                                    <ProductForm />
+                              </Form>
+                        </Drawer>
                   </Space>
             </>
       );

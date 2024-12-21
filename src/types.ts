@@ -32,9 +32,25 @@ export type FieldData = {
     value?: string;
 }
 
-export interface Category {
-    _id: number;
+export interface PriceConfiguaration {
+    [key: string]: {
+        priceType: "base" | "aditional";
+        availableOptions: string[];
+    };
+}
+
+export interface Attribute {
     name: string;
+    widgetType: "switch" | "radio";
+    defaultValue: string;
+    availableOptions: string[];
+}
+
+export interface Category {
+    _id: string;
+    name: string;
+    priceConfiguration: PriceConfiguaration;
+    attributes: Attribute[];
 }
 
 export interface Product {
@@ -46,4 +62,10 @@ export interface Product {
     status: boolean;
     isPublish: boolean;
     createdAt: string;
+}
+
+export type CreateProductData = Product & {
+    image: {
+        file: File
+    }
 }
