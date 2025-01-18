@@ -3,6 +3,7 @@ import { api } from "./client";
 
 export const AUTH_SERVICE= '/api/auth';
 const CATALOG_SERVICE = '/api/catalog';
+const ORDER_SERVICE = '/api/order';
 
 //Auth service
 export const login = (credentials: Credentials) => api.post(`${AUTH_SERVICE}/auth/login`, credentials)
@@ -17,7 +18,7 @@ export const getTenants = (queryString: string) => api.get(`${AUTH_SERVICE}/tena
 export const createTenant = (tenant: Tenant) => api.post(`${AUTH_SERVICE}/tenants`, tenant)
 export const editTenant = (tenant: Tenant, id: number) => api.patch(`${AUTH_SERVICE}/tenants/${id}`, tenant)
 
-//Catalog service
+//Catalog service--------------
 export const getCategories = () => api.get(`${CATALOG_SERVICE}/categories`);
 export const getCategory = (id: string) => api.get(`${CATALOG_SERVICE}/categories/${id}`);
 
@@ -32,3 +33,7 @@ export const putProduct = (data: FormData, id: string) => api.put(`${CATALOG_SER
         'Content-Type': 'multipart/form-data',
     },
 });
+
+//Order service----------------
+
+export const getOrders = (queryString: string) => api.get(`${ORDER_SERVICE}/order?${queryString}`);
