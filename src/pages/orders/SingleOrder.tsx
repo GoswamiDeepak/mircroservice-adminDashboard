@@ -1,16 +1,24 @@
-import { Avatar, Breadcrumb, Card, Col, Flex, List, Row, Space, Tag, Typography } from 'antd';
+import { Avatar, Breadcrumb, Card, Col, Flex, List, Row, Select, Space, Tag, Typography } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
 import { colorMapping } from '../../constant';
 import { capitalizeFirst } from '../../utils';
-import { useQuery } from '@tanstack/react-query';
-import { getSingleOrder } from '../../http/api';
-import { Order } from '../../types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { changeOrderStatus, getSingleOrder } from '../../http/api';
+import { Order, OrderStatus } from '../../types';
 import { format } from 'date-fns';
+
+const orderStatusOptions = [
+    { value: 'received', label: 'Received' },
+    { value: 'confirmed', label: 'Confirmed' },
+    { value: 'prepared', label: 'Prepared' },
+    { value: 'out_for_delivery', label: 'Out for delivery' },
+    { value: 'delivered', label: 'Delivered' },
+];
 
 const SingleOrder = () => {
     const { orderId } = useParams();
-
+    const queryClient = useQueryClient();
     const { data: order } = useQuery<Order>({
         queryKey: ['order', orderId],
         queryFn: async () => {
@@ -23,20 +31,47 @@ const SingleOrder = () => {
         },
     });
 
+    const { mutate: updateOrderStatus } = useMutation({
+        mutationKey: ['orderStatus', orderId],
+        mutationFn: async (orderStatus: OrderStatus) => {
+            //TODO: orderstatus must not go to backend status
+            await changeOrderStatus(orderId as string, orderStatus as string);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['order', orderId] });
+        },
+    });
+
+    const statusChangeHandler = (value: OrderStatus) => {
+        updateOrderStatus(value);
+    };
+
     if (!order) {
         return null;
     }
 
     return (
         <Space direction="vertical" style={{ width: '100%' }} size="large">
-            <Breadcrumb
-                separator={<RightOutlined />}
-                items={[
-                    { title: <Link to="/">Dashboard</Link> },
-                    { title: <Link to="/orders">Orders</Link> },
-                    { title: `Order #${orderId}` },
-                ]}
-            />
+            <Flex justify="space-between" align="center">
+                <Breadcrumb
+                    separator={<RightOutlined />}
+                    items={[
+                        { title: <Link to="/">Dashboard</Link> },
+                        { title: <Link to="/orders">Orders</Link> },
+                        { title: `Order #${orderId}` },
+                    ]}
+                />
+                <Space>
+                    <Typography.Text>Chage Order Status:</Typography.Text>
+                    <Select
+                        defaultValue={order?.orderStatus}
+                        style={{ width: 150 }}
+                        onChange={statusChangeHandler}
+                        options={orderStatusOptions}
+                    />
+                </Space>
+            </Flex>
+
             <Row gutter={24}>
                 <Col span={14}>
                     <Card
