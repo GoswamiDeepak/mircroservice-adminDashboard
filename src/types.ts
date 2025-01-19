@@ -128,4 +128,5 @@ export interface Order {
     orderStatus: OrderStatus;
     paymentStatus: PaymentStatus;
     paymentId?: string;
+    createdAt: Date
 }

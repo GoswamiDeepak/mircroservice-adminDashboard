@@ -37,3 +37,4 @@ export const putProduct = (data: FormData, id: string) => api.put(`${CATALOG_SER
 //Order service----------------
 
 export const getOrders = (queryString: string) => api.get(`${ORDER_SERVICE}/order?${queryString}`);
+export const getSingleOrder = (orderId:string, queryString: string) => api.get(`${ORDER_SERVICE}/order/${orderId}?${queryString}`);

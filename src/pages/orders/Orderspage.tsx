@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import { PlusOutlined, RightOutlined } from '@ant-design/icons';
 import OrdersFilter from './OrdersFilter';
 import { FieldData, Order } from '../../types';
-import { render } from '@testing-library/react';
 import { useQuery } from '@tanstack/react-query';
 import { getOrders } from '../../http/api';
 import { format } from 'date-fns';
+import { colorMapping } from '../../constant';
+import { capitalizeFirst } from '../../utils';
 
 const columns = [
     {
@@ -54,7 +55,11 @@ const columns = [
         dataIndex: 'orderStatus',
         key: 'orderStatus',
         render: (_text: string, record: Order) => {
-            return <Tag color="red">{record.orderStatus}</Tag>;
+            return (
+                <Tag color={colorMapping[record.orderStatus]} bordered={false}>
+                    {capitalizeFirst(record.orderStatus)}
+                </Tag>
+            );
         },
     },
     {
